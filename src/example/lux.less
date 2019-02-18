@@ -1,0 +1,56 @@
+/* luxcss */
+.createNormal(@cls, @prop, @length, @list, @index: 1) when (@index =< @length) {
+  @item: extract(@list, @index);
+  .@{cls}@{item} {
+    @{prop}: @item /1 * 1px;
+  }
+  .createNormal(@cls, @prop, @length, @list, (@index + 1));
+}
+.createPercent(@cls, @prop, @length, @list, @index: 1) when (@index =< @length) {
+  @item: extract(@list, @index);
+  .@{cls}@{item} {
+    @{prop}: percentage(@item / 100);
+  }
+  .createPercent(@cls, @prop, @length, @list, (@index + 1));
+}
+.createInteger(@cls, @prop, @length, @list, @index: 1) when (@index =< @length) {
+  @item: extract(@list, @index);
+  .@{cls}@{item} {
+    @{prop}: @item;
+  }
+  .createInteger(@cls, @prop, @length, @list, (@index + 1));
+}
+.createDecimal(@cls, @prop, @length, @list, @index: 1) when (@index =< @length) {
+  @item: extract(@list, @index);
+  .@{cls}@{item} {
+    @{prop}: (@item / 100);
+  }
+  .createDecimal(@cls, @prop, @length, @list, (@index + 1));
+}
+.createColor(@cls, @prop, @length,@list,@index: 1) when (@index =< @length) {
+  @it: escape(extract(@list, @index));
+  @item: escape(@it);
+  .@{cls}@{item} {
+    @{prop}: color('#@{item}');
+  }
+  .createColor(@cls, @prop, @length, @list, (@index + 1));
+}
+
+.lux-center {
+display: flex; align-items: center;justify-content: center;
+}
+.lux-cur-p {
+cursor:pointer;
+}
+
+@w: 110;
+@h: 30;
+@bdrs: 4;
+@bgc: '00b51d';
+@c: 'fff';
+
+.createNormal(lux-w, width, length(@w), @w);
+.createNormal(lux-h, height, length(@h), @h);
+.createNormal(lux-bdrs, border-radius, length(@bdrs), @bdrs);
+.createColor(lux-c, color, length(@c), @c);
+.createColor(lux-bgc, background-color, length(@bgc), @bgc);

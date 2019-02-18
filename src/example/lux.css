@@ -1,0 +1,24 @@
+/* luxcss */
+.lux-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.lux-cur-p {
+  cursor: pointer;
+}
+.lux-w110 {
+  width: 110px;
+}
+.lux-h30 {
+  height: 30px;
+}
+.lux-bdrs4 {
+  border-radius: 4px;
+}
+.lux-cfff {
+  color: #fff;
+}
+.lux-bgc00b51d {
+  background-color: #00b51d;
+}

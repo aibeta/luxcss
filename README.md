@@ -10,7 +10,8 @@ luxcss 是一个样式生成工具，它可以监听你在 html/wxml/vue/jsx 文
 - 启用服务，可编辑 src/example/index.html 查看示例
 
 ```
-$ git clone 
+$ git clone https://github.com/aibeta/luxcss.git
+$ cd luxcss
 $ npm install
 $ npm start
 ```

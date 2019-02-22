@@ -62,6 +62,7 @@ const unitValue = {
   pb: 'padding-bottom',
   pl: 'padding-left',
   fz: 'font-size',
+  ti: 'text-indent',
   bdw: 'border-width',
   bdtw: 'border-top-width',
   bdbw: 'border-bottom-width',

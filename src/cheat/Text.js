@@ -33,7 +33,7 @@ module.exports = {
   'th-f': 'text-height:font-size;',
   'th-t': 'text-height:text-size;',
   'th-m': 'text-height:max-size;',
-  'ti--': 'text-indent:-9999px;',
+  // 'ti--': 'text-indent:-9999px;',
   'tj-a': 'text-justify:auto;',
   'tj-iw': 'text-justify:inter-word;',
   'tj-ii': 'text-justify:inter-ideograph;',

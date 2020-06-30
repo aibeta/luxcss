@@ -1,15 +1,16 @@
 {
   "compilerOptions": {
     // 如果用于浏览器，需要添加 ‘dom’
-    "lib": ["es2015"],
+    "lib": ["es2019"],
     // TSC 会把文件转换成 CommonJS 模块
-    "module": "commonjs",
+    "module": "system",
     // TSC 用存放生成的 javascript
     "outDir": "dist",
     "sourceMap": true,
     "strict": true,
     // TSC 编译的JS 版本：包括 ES5 ES2015..
-    "target": "es2015"
+    "target": "es6",
+    "outFile": "dist/lux.js",
   },
   // TSC 来获取 typescript 的路径
   "include": [

@@ -9,15 +9,14 @@
   },
   "author": "",
   "license": "ISC",
-  "devDependencies": {
-    "chai": "^4.2.0",
-    "eslint": "^5.10.0",
-    "eslint-config-airbnb-base": "^13.1.0",
-    "eslint-plugin-import": "^2.14.0",
-    "mocha": "^5.1.1"
-  },
+  "devDependencies": {},
   "dependencies": {
-    "less": "^3.0.2",
-    "chokidar": "^2.0.4"
+    "@types/node": "^14.0.14",
+    "chai": "^4.2.0",
+    "chokidar": "^2.0.4",
+    "mocha": "^5.1.1",
+    "sass": "^1.26.9",
+    "tslint": "^6.1.2",
+    "typescript": "^3.9.5"
   }
 }

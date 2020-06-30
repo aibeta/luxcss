@@ -1,0 +1,40 @@
+/* luxcss */
+.l-pos {
+  display: block;
+}
+
+.l-d-b {
+  display: block;
+}
+
+.l-d-f {
+  display: block;
+}
+
+.u-w80 {
+  width: 80px;
+}
+
+.u-lh1 {
+  line-height: 1px;
+}
+
+.u-lh1d5 {
+  line-height: 1.5;
+}
+
+.u-t150 {
+  top: 150px;
+}
+
+.u-t150p {
+  top: 150%;
+}
+
+.u-ml-20 {
+  margin-left: -20px;
+}
+
+.u-bgceee {
+  background-color: #eee;
+}

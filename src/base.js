@@ -20,7 +20,7 @@ const userValue = {
   'bdrs-s': 'border-right-style: solid;',
 };
 
-const baseValue = Object.assign({},
+const enumValue = Object.assign({},
   userValue,
   VisualFormatting,
   Background,
@@ -85,7 +85,10 @@ const colorValue = {
 };
 
 module.exports = {
-  baseValue,
+  enumValue,
   unitValue,
   colorValue,
+  enumValueKeys: Object.keys(enumValue),
+  unitValueKeys: Object.keys(unitValue),
+  colorValueKeys: Object.keys(colorValue),
 };

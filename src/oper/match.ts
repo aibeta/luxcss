@@ -1,7 +1,7 @@
 
 const { enumValueKeys, unitValueKeys, colorValueKeys } = require('../base');
 
-function matchEnum(str) {
+function matchEnum(str: string){
   const keys = enumValueKeys.join('|');
 
   const regex = new RegExp(`l-(${keys})(\\s|'|")`, 'g');
@@ -10,7 +10,7 @@ function matchEnum(str) {
   return result.map(d => d.substring(0, d.length - 1));
 }
 
-function matchUnit(str) {
+function matchUnit(str: string){
   const keys = unitValueKeys.join('|');
 
   // /lux-(w|h|lh|minh|maxh|minw|maxw|br|mt|mr|mb|ml|pt|pr|pb|pl|fs|bdw)\d+/g
@@ -19,7 +19,7 @@ function matchUnit(str) {
   return result;
 }
 
-function matchUnitDecimal(str) {
+function matchUnitDecimal(str: string){
   const keys = unitValueKeys.join('|');
 
   const regex = new RegExp(`u-(${keys})-?\\d+d\\d+`, 'g');
@@ -27,7 +27,7 @@ function matchUnitDecimal(str) {
   return result;
 }
 
-function matchUnitPercent(str) {
+function matchUnitPercent(str: string){
   const keys = unitValueKeys.join('|');
 
   const regex = new RegExp(`u-(${keys})-?\\d+p\\d?`, 'g');
@@ -35,7 +35,7 @@ function matchUnitPercent(str) {
   return result;
 }
 
-function matchUnitNone(str) {
+function matchUnitNone(str: string){
   const keys = unitValueKeys.join('|');
 
   const regex = new RegExp(`u-(${keys})-?\\d+n`, 'g');
@@ -43,7 +43,7 @@ function matchUnitNone(str) {
   return result;
 }
 
-function matchColor(str) {
+function matchColor(str: string){
   const keys = colorValueKeys.join('|');
 
   // /lux-(co|bg|bdc)[a-f|A-F|0-9]{3,6}/g
@@ -52,7 +52,7 @@ function matchColor(str) {
   return result;
 }
 
-function filter(str) {
+export function filter(str: string) {
   const unit = [
     ...matchUnit(str),
     ...matchUnitNone(str),
@@ -67,6 +67,6 @@ function filter(str) {
   };
 }
 
-module.exports = {
+export default {
   filter,
 };

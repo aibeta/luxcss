@@ -13,6 +13,12 @@ export function padZero(v: number): string {
   return v < 10 ? `0${v}` : `{v}`;
 }
 
+export function isNumber(v: string) {
+  // @ts-ignore
+  if (0 + v == Number(v)) return true;
+  return false;
+}
+
 export function hms() {
   const date = new Date();
   let h = date.getHours();
@@ -37,6 +43,7 @@ export function diffDecreaseList(list1 = [], list2 = []) {
 export default {
   sortString,
   sort,
+  isNumber,
   hms,
   diffDecreaseList,
 };

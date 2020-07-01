@@ -23,10 +23,24 @@
     chalk "^2.0.0"
     js-tokens "^4.0.0"
 
-"@types/node@^14.0.14":
+"@types/chokidar@^2.1.3":
+  version "2.1.3"
+  resolved "https://registry.npm.taobao.org/@types/chokidar/download/@types/chokidar-2.1.3.tgz#123ab795dba6d89be04bf076e6aecaf8620db674"
+  integrity sha1-Ejq3ldum2JvgS/B25q7K+GINtnQ=
+  dependencies:
+    chokidar "*"
+
+"@types/node@*", "@types/node@^14.0.14":
   version "14.0.14"
   resolved "https://registry.npm.taobao.org/@types/node/download/@types/node-14.0.14.tgz?cache=0&sync_timestamp=1592987739042&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Fnode%2Fdownload%2F%40types%2Fnode-14.0.14.tgz#24a0b5959f16ac141aeb0c5b3cd7a15b7c64cbce"
   integrity sha1-JKC1lZ8WrBQa6wxbPNehW3xky84=
+
+"@types/sass@^1.16.0":
+  version "1.16.0"
+  resolved "https://registry.npm.taobao.org/@types/sass/download/@types/sass-1.16.0.tgz#b41ac1c17fa68ffb57d43e2360486ef526b3d57d"
+  integrity sha1-tBrBwX+mj/tX1D4jYEhu9Saz1X0=
+  dependencies:
+    "@types/node" "*"
 
 ansi-styles@^3.2.1:
   version "3.2.1"
@@ -225,7 +239,7 @@ check-error@^1.0.2:
   resolved "https://registry.npm.taobao.org/check-error/download/check-error-1.0.2.tgz#574d312edd88bb5dd8912e9286dd6c0aed4aac82"
   integrity sha1-V00xLt2Iu13YkS6Sht1sCu1KrII=
 
-"chokidar@>=2.0.0 <4.0.0":
+chokidar@*, "chokidar@>=2.0.0 <4.0.0":
   version "3.4.0"
   resolved "https://registry.npm.taobao.org/chokidar/download/chokidar-3.4.0.tgz?cache=0&sync_timestamp=1589682823083&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fchokidar%2Fdownload%2Fchokidar-3.4.0.tgz#b30611423ce376357c765b9b8f904b9fba3c0be8"
   integrity sha1-swYRQjzjdjV8dlubj5BLn7o8C+g=

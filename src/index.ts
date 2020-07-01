@@ -1,19 +1,15 @@
-const chokidar = require('chokidar');
+import { hms } from "../util/index";
+import { read, renderSass, write } from './oper/file';
 const path = require('path');
-const { readdir } = require('fs').promises;
-// const { hms } = require('../util/index.ts');
 const { root, dist } = require('./config');
-const { main } = require('./oper/main');
+const chokidar = require('chokidar');
+const { readdir } = require('fs').promises;
+
+const { extractEnum, extractUnit, extractColor } = require('./oper/extract');
+const { makeLessTemplate } = require('./oper/sass.template');
+
 const distPath = path.join(__dirname, dist);
 
-import { hms } from "../util/index";
-
-// define
-// file: /a/b/c.md 
-type File = string
-type Files = File[]
-// filename: c.md
-type FileName= string
 // path: /a/b
 type Path = string
 // absolte path of a file or directory
@@ -22,7 +18,7 @@ type FullPaths = Path[]
 type Dirent = any
 
 // recursively find all files' full paths inside root
-async function getFullPaths(root: Path): Promise<FullPaths[]> {
+async function getFullPaths(root: Path): Promise<FullPaths> {
   const directoryAndFiles = await readdir(root, { withFileTypes: true });
 
   const files: any[] = await Promise.all(directoryAndFiles.map((directory: Dirent) => {
@@ -37,7 +33,24 @@ async function getFullPaths(root: Path): Promise<FullPaths[]> {
   return files.flat();
 }
 
-function watch(paths: FullPaths[]) {
+async function main(filePathLists: FullPaths) {
+  const { enumList, unitList, colorList } = await read(filePathLists);
+
+  const enums = extractEnum(enumList);
+  const unit = extractUnit(unitList);
+  const color = extractColor(colorList);
+
+  const styleFile = makeLessTemplate(enums, unit, color);
+
+  const output = await renderSass(styleFile);
+
+  write(output.css, `${dist}`);
+
+  const time = hms();
+  console.log(`${time}: 写入成功`);
+}
+
+function watch(paths: FullPaths) {
   const watcher = chokidar.watch(paths, {
     persistent: true,
   });

@@ -1,23 +1,27 @@
 const { enumValue, unitValue, colorValue } = require('../base');
 const { unit } = require('../config');
 
-function makeBaseList(uniqueBaseList) {
+function makeBaseList(uniqueBaseList: string[]) {
   return uniqueBaseList.map((d) => {
     const [key, value] = enumValue.d.split(':');
     return `@include lux("l-${d}", ${key}, ${value.split(';')[0]});`;
   });
 }
 
-function makeUnitList(unitData) {
+interface unitKeyV {
+  [name: string]: string[]
+}
+
+function makeUnitList(unitData: unitKeyV) {
   const obj = unitData;
 
-  const unitList = [];
+  const unitList: string[] = [];
   // 排序，转化为字符串
   // 把 { lh: [150, 1d5, 100p, 1] }
   // 变为 { lh: '150px, 1.5, 100%, 1' }
 
-  Object.keys(obj).forEach((k) => {
-    const list = obj[k];
+  Object.keys(obj).forEach((k: string) => {
+    const list: string[] = obj[k];
 
     // 15p
     list.forEach((cls) => {
@@ -35,13 +39,14 @@ function makeUnitList(unitData) {
   return unitList;
 }
 
-function makeColorList(colorData) {
+function makeColorList(colorData: unitKeyV) {
   const obj = colorData;
 
-  const colorList = [];
+  const colorList: string[] = [];
 
   Object.keys(obj).forEach((k) => {
-    const list = obj[k].split(',');
+
+    const list: string[] = obj[k];
 
     list.forEach((cls) => {
       colorList.push(`@include lux("u-${k}${cls}", ${colorValue[k]}, #${cls});`);
@@ -52,7 +57,7 @@ function makeColorList(colorData) {
 }
 
 
-function makeLessTemplate(uniqueBaseList, unitData, colorData) {
+function makeLessTemplate(uniqueBaseList: string[], unitData: unitKeyV, colorData: unitKeyV) {
   const baseList = makeBaseList(uniqueBaseList).join('\n');
 
   const unitList = makeUnitList(unitData).join('\n');

@@ -9,6 +9,7 @@ interface unitKey {
 export function extractEnum(baseList: string[]) {
   const filterdSet = new Set(baseList);
   const filterdList = [...filterdSet];
+  console.log(filterdList);
   return filterdList.map(d => d.split('l-')[1]);
 }
 

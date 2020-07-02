@@ -1,10 +1,10 @@
 
 const { enumValueKeys, unitValueKeys, colorValueKeys } = require('../base');
 
-function matchEnum(str: string){
+export function matchEnum(str: string){
   const keys = enumValueKeys.join('|');
 
-  const regex = new RegExp(`l-(${keys})(\\s|'|")`, 'g');
+  const regex = new RegExp(`l-(${keys})(\\(|\\.|\\s|'|")`, 'g');
   const result = str.match(regex);
   if (!result) return [];
   return result.map(d => d.substring(0, d.length - 1));
@@ -69,4 +69,5 @@ export function filter(str: string) {
 
 export default {
   filter,
+  matchEnum,
 };

@@ -1,38 +1,30 @@
 /* luxcss */
-.l-pos {
-  display: block;
-}
-
 .l-d-b {
   display: block;
 }
 
 .l-d-f {
-  display: block;
+  display: flex;
 }
 
-.u-w80 {
-  width: 80px;
-}
-
-.u-lh1 {
-  line-height: 1px;
+.l-pos {
+  position: relative;
 }
 
 .u-lh1d5 {
   line-height: 1.5;
 }
 
-.u-t150 {
-  top: 150px;
+.u-ml-20 {
+  margin-left: -20px;
 }
 
 .u-t150p {
   top: 150%;
 }
 
-.u-ml-20 {
-  margin-left: -20px;
+.u-w80 {
+  width: 80px;
 }
 
 .u-bgceee {

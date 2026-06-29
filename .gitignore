@@ -1,4 +1,6 @@
 node_modules/
+dist/
+dist-playground/
 .vscode
 package-lock.json
 etc/

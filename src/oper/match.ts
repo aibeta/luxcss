@@ -1,67 +1,52 @@
-
 const { enumValueKeys, unitValueKeys, colorValueKeys } = require('../base');
 
-export function matchEnum(str: string){
-  const keys = enumValueKeys.join('|');
+const CLASS_BOUNDARY = '[^A-Za-z0-9_-]';
+const UNIT_VALUE_PATTERN = '-?\\d+(?:d\\d+)?n|-?\\d+p\\d*|-?\\d+d\\d+|-?\\d+';
+const HEX_COLOR_PATTERN = '[a-fA-F0-9]{6}|[a-fA-F0-9]{3}';
 
-  const regex = new RegExp(`l-(${keys})(\\(|\\.|\\s|'|")`, 'g');
-  const result = str.match(regex);
-  if (!result) return [];
-  return result.map(d => d.substring(0, d.length - 1));
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-function matchUnit(str: string){
-  const keys = unitValueKeys.join('|');
+function sortedAlternation(values: string[]): string {
+  return values
+    .slice()
+    .sort((a, b) => b.length - a.length || a.localeCompare(b))
+    .map(escapeRegExp)
+    .join('|');
+}
 
-  // /lux-(w|h|lh|minh|maxh|minw|maxw|br|mt|mr|mb|ml|pt|pr|pb|pl|fs|bdw)\d+/g
-  const regex = new RegExp(`u-(${keys})-?\\d+`, 'g');
-  const result = str.match(regex) || [];
+function collectClassMatches(str: string, classPattern: string): string[] {
+  const regex = new RegExp(`(^|${CLASS_BOUNDARY})(${classPattern})(?=$|${CLASS_BOUNDARY})`, 'g');
+  const result: string[] = [];
+  let match = regex.exec(str);
+
+  while (match) {
+    result.push(match[2]);
+    match = regex.exec(str);
+  }
+
   return result;
 }
 
-function matchUnitDecimal(str: string){
-  const keys = unitValueKeys.join('|');
-
-  const regex = new RegExp(`u-(${keys})-?\\d+d\\d+`, 'g');
-  const result = str.match(regex) || [];
-  return result;
+export function matchEnum(str: string): string[] {
+  const keys = sortedAlternation(enumValueKeys);
+  return collectClassMatches(str, `l-(?:${keys})`);
 }
 
-function matchUnitPercent(str: string){
-  const keys = unitValueKeys.join('|');
-
-  const regex = new RegExp(`u-(${keys})-?\\d+p\\d?`, 'g');
-  const result = str.match(regex) || [];
-  return result;
+export function matchUnit(str: string): string[] {
+  const keys = sortedAlternation(unitValueKeys);
+  return collectClassMatches(str, `u-(?:${keys})(?:${UNIT_VALUE_PATTERN})`);
 }
 
-function matchUnitNone(str: string){
-  const keys = unitValueKeys.join('|');
-
-  const regex = new RegExp(`u-(${keys})-?\\d+n`, 'g');
-  const result = str.match(regex) || [];
-  return result;
-}
-
-function matchColor(str: string){
-  const keys = colorValueKeys.join('|');
-
-  // /lux-(co|bg|bdc)[a-f|A-F|0-9]{3,6}/g
-  const regex = new RegExp(`u-(${keys})[a-f|A-F|0-9]{3,6}`, 'g');
-  const result = str.match(regex) || [];
-  return result;
+export function matchColor(str: string): string[] {
+  const keys = sortedAlternation(colorValueKeys);
+  return collectClassMatches(str, `u-(?:${keys})(?:${HEX_COLOR_PATTERN})`);
 }
 
 export function filter(str: string) {
-  const unit = [
-    ...matchUnit(str),
-    ...matchUnitNone(str),
-    ...matchUnitDecimal(str),
-    ...matchUnitPercent(str),
-  ];
-
   return {
-    unit,
+    unit: matchUnit(str),
     enums: matchEnum(str),
     color: matchColor(str),
   };
@@ -70,4 +55,6 @@ export function filter(str: string) {
 export default {
   filter,
   matchEnum,
+  matchUnit,
+  matchColor,
 };

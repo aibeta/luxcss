@@ -1,80 +1,101 @@
 const { enumValue, unitValue, colorValue } = require('../base');
 const { unit } = require('../config');
 
-function makeBaseList(uniqueBaseList: string[]) {
-  return uniqueBaseList.map((d) => {
-    const [key, value] = enumValue.d.split(':');
-    return `@include lux("l-${d}", ${key}, ${value.split(';')[0]});`;
-  });
+interface ClassGroups {
+  [name: string]: string[];
 }
 
-interface unitKeyV {
-  [name: string]: string[]
+function formatDeclarations(declarationText: string): string {
+  return declarationText
+    .split(';')
+    .map((declaration) => declaration.trim())
+    .filter(Boolean)
+    .map((declaration) => {
+      const separatorIndex = declaration.indexOf(':');
+      if (separatorIndex < 0) return `  ${declaration};`;
+
+      const property = declaration.substring(0, separatorIndex).trim();
+      const value = declaration.substring(separatorIndex + 1).trim();
+      return `  ${property}: ${value};`;
+    })
+    .join('\n');
 }
 
-function makeUnitList(unitData: unitKeyV) {
-  const obj = unitData;
+function makeRule(className: string, declarationText: string): string {
+  return `.${className} {\n${formatDeclarations(declarationText)}\n}`;
+}
 
-  const unitList: string[] = [];
-  // 排序，转化为字符串
-  // 把 { lh: [150, 1d5, 100p, 1] }
-  // 变为 { lh: '150px, 1.5, 100%, 1' }
+function toCssValue(rawValue: string): string {
+  let value = rawValue;
+  let unitless = false;
 
-  Object.keys(obj).forEach((k: string) => {
-    const list: string[] = obj[k];
+  if (value.endsWith('n')) {
+    unitless = true;
+    value = value.substring(0, value.length - 1);
+  }
 
-    // 15p
-    list.forEach((cls) => {
-      let value;
+  if (value.includes('p')) {
+    const numeric = value.endsWith('p')
+      ? value.substring(0, value.length - 1)
+      : value.replace('p', '.');
+    return `${numeric}%`;
+  }
 
-      if (cls.indexOf('d') > -1) value = cls.replace('d', '.');
-      else if (cls.indexOf('p') > -1) value = cls.replace('p', '%');
-      else if (cls.indexOf('n') > -1) value = cls.replace('n', '');
-      else value = `${cls}${unit}`;
+  if (value.includes('d')) {
+    value = value.replace('d', '.');
+    return value;
+  }
 
-      unitList.push(`@include lux("u-${k}${cls}", ${unitValue[k]}, ${value});`);
+  return unitless ? value : `${value}${unit}`;
+}
+
+function makeBaseList(uniqueBaseList: string[]): string[] {
+  return uniqueBaseList
+    .map((name) => {
+      const declaration = enumValue[name];
+      if (!declaration) return '';
+      return makeRule(`l-${name}`, declaration);
+    })
+    .filter(Boolean);
+}
+
+function makeUnitList(unitData: ClassGroups): string[] {
+  const rules: string[] = [];
+
+  Object.keys(unitData).forEach((key: string) => {
+    const property = unitValue[key];
+    if (!property) return;
+
+    unitData[key].forEach((rawValue) => {
+      rules.push(makeRule(`u-${key}${rawValue}`, `${property}: ${toCssValue(rawValue)};`));
     });
   });
 
-  return unitList;
+  return rules;
 }
 
-function makeColorList(colorData: unitKeyV) {
-  const obj = colorData;
+function makeColorList(colorData: ClassGroups): string[] {
+  const rules: string[] = [];
 
-  const colorList: string[] = [];
+  Object.keys(colorData).forEach((key) => {
+    const property = colorValue[key];
+    if (!property) return;
 
-  Object.keys(obj).forEach((k) => {
-
-    const list: string[] = obj[k];
-
-    list.forEach((cls) => {
-      colorList.push(`@include lux("u-${k}${cls}", ${colorValue[k]}, #${cls});`);
+    colorData[key].forEach((rawValue) => {
+      rules.push(makeRule(`u-${key}${rawValue}`, `${property}: #${rawValue};`));
     });
   });
 
-  return colorList;
+  return rules;
 }
 
+export function makeLessTemplate(uniqueBaseList: string[], unitData: ClassGroups, colorData: ClassGroups): string {
+  const rules = [
+    ...makeBaseList(uniqueBaseList),
+    ...makeUnitList(unitData),
+    ...makeColorList(colorData),
+  ];
 
-function makeLessTemplate(uniqueBaseList: string[], unitData: unitKeyV, colorData: unitKeyV) {
-  const baseList = makeBaseList(uniqueBaseList).join('\n');
-
-  const unitList = makeUnitList(unitData).join('\n');
-
-  const colorList = makeColorList(colorData).join('\n');
-
-  return `/* luxcss */
-@mixin lux($name, $property, $value) {
-  .#{$name} { #{$property}: #{$value}; }
+  return `/* luxcss */\n${rules.join('\n\n')}\n`;
 }
 
-${baseList}
-${unitList}
-${colorList}
-`;
-}
-
-module.exports = {
-  makeLessTemplate,
-};

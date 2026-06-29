@@ -1,77 +1,63 @@
-const fs = require('fs');
-const sass = require('sass');
+import { promises as fs } from 'fs';
+import * as path from 'path';
 import { filter } from './match';
 
+const sass = require('sass');
+
 // path: /a/b or a/b/c.md
-type Path = string
-// absolte path of a file or directory
-type FullPaths = Path[]
+type Path = string;
+// absolute path of a file or directory
+type FullPaths = Path[];
 
-interface result {
-  enumList: string[],
-  unitList: string[],
-  colorList: string[],
+interface ReadResult {
+  enumList: string[];
+  unitList: string[];
+  colorList: string[];
 }
 
-function readFile(filePath: Path): Promise<string> {
+async function readFile(filePath: Path): Promise<string> {
+  const data = await fs.readFile(filePath);
+  return data.toString();
+}
+
+export async function read(filePaths: FullPaths = []): Promise<ReadResult> {
+  const result: ReadResult = {
+    enumList: [],
+    unitList: [],
+    colorList: [],
+  };
+
+  await Promise.all(filePaths.map(async (filePath) => {
+    const fileStr = await readFile(filePath);
+    const { enums, unit, color } = filter(fileStr);
+
+    result.enumList.push(...enums);
+    result.unitList.push(...unit);
+    result.colorList.push(...color);
+  }));
+
+  return result;
+}
+
+export async function write(content: string, fullPath: Path): Promise<void> {
+  await fs.mkdir(path.dirname(fullPath), { recursive: true });
+  await fs.writeFile(fullPath, content);
+}
+
+export function renderSass(content: string): Promise<string> {
+  if (typeof sass.compileString === 'function') {
+    const output = sass.compileString(content, { style: 'expanded' });
+    return Promise.resolve(output.css);
+  }
+
   return new Promise((resolve, reject) => {
-    fs.readFile(filePath, (err: any, data: any) => {
-      if (err) {
-        reject(err);
-        return console.error(err);
-      }
-      resolve(data.toString());
-    });
-  });
-}
-
-export function read(file_path: FullPaths = []): Promise<result> {
-  // 控制异步，可得到所有文件读取完毕
-  return new Promise((resovle, reject) => {
-    let pageLen = 0;
-    let enumList: string[] = [];
-    let unitList: string[] = [];
-    let colorList: string[] = [];
-    file_path.forEach((d) => {
-      pageLen += 1;
-
-      readFile(d).then((fileStr: string) => {
-        pageLen -= 1;
-
-        const { enums, unit, color } = filter(fileStr);
-
-        // 存储每个页面和对应的列表
-        enumList = [...enumList, ...enums];
-        unitList = [...unitList, ...unit];
-        colorList = [...colorList, ...color];
-        // 所有文件读取完毕，进行数据处理
-        if (pageLen === 0) {
-          resovle({ enumList, unitList, colorList });
-        }
-      }).catch((e) => {
-        console.log(e);
-        reject();
-      });
-    });
-  });
-}
-
-export function write(content: string, full_path: Path) {
-  fs.writeFile(full_path, content, (err: any) => {
-    if (err) {
-      return console.error(err);
-    }
-  });
-}
-
-export function renderSass(content: string): Promise<any> {
-  return new Promise((resolve, reject) => {
-    sass.render({ data: content }, (error: any, output: any) => {
+    sass.render({ data: content }, (error: Error, output: { css: Buffer }) => {
       if (error) {
-        console.log('sass render 出错');
         reject(error);
+        return;
       }
-      resolve(output);
+
+      resolve(output.css.toString());
     });
   });
 }
@@ -80,4 +66,4 @@ export default {
   read,
   write,
   renderSass,
-}
+};

@@ -1,70 +1,71 @@
-import { sort, isNumber} from '../../util/index';
+const { colorValueKeys, unitValueKeys } = require('../base');
 
-const { colorValueKeys } = require('../base');
-
-interface unitKey {
-  [name: string]: string[]
+interface ClassGroups {
+  [name: string]: string[];
 }
 
-export function extractEnum(baseList: string[]) {
-  const filterdSet = new Set(baseList);
-  const filterdList = [...filterdSet];
-  console.log(filterdList);
-  return filterdList.map(d => d.split('l-')[1]);
+const UNIT_VALUE_PATTERN = '-?\\d+(?:d\\d+)?n|-?\\d+p\\d*|-?\\d+d\\d+|-?\\d+';
+const HEX_COLOR_PATTERN = '[a-fA-F0-9]{6}|[a-fA-F0-9]{3}';
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-// 分离列表中的前缀和数值，eg: lux-mt20 => k:mt, v:20,30
-export function extractUnit(unitList: string[]) {
-  const filterdSet = new Set(unitList);
-  const filterdList = [...filterdSet];
-  const obj: unitKey = {};
+function sortedUnique(list: string[]): string[] {
+  return Array.from(new Set(list)).sort((a, b) => a.localeCompare(b));
+}
 
-  filterdList.forEach((word) => {
-    const d = word.substring(2);
+function sortedAlternation(values: string[]): string {
+  return values
+    .slice()
+    .sort((a, b) => b.length - a.length || a.localeCompare(b))
+    .map(escapeRegExp)
+    .join('|');
+}
 
-    const index = d.split('').findIndex((v) => {
-      if (isNumber(v)) return true;
-      if (v === '-') return true;
-      return false;
-    });
+function addGroupValue(groups: ClassGroups, key: string, value: string) {
+  const oldList = groups[key] || [];
+  if (!oldList.includes(value)) {
+    groups[key] = oldList.concat(value).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+  }
+}
 
-    const key = d.substring(0, index);
-    const value = d.substring(index);
+export function extractEnum(baseList: string[]): string[] {
+  return sortedUnique(baseList)
+    .filter((word) => word.startsWith('l-'))
+    .map((word) => word.substring(2));
+}
 
-    const oldList = obj[key] || [];
-    obj[key] = oldList.concat([value]);
+// Split class tokens into property prefix and value.
+// Example: u-ml-20 -> { ml: ['-20'] }, u-lh1d5 -> { lh: ['1d5'] }
+export function extractUnit(unitList: string[]): ClassGroups {
+  const groups: ClassGroups = {};
+  const keys = sortedAlternation(unitValueKeys);
+  const regex = new RegExp(`^u-(${keys})(${UNIT_VALUE_PATTERN})$`);
+
+  sortedUnique(unitList).forEach((word) => {
+    const result = word.match(regex);
+    if (!result) return;
+
+    addGroupValue(groups, result[1], result[2]);
   });
 
-  return obj;
+  return groups;
 }
 
-export function extractColor(colorList: string[]) {
-  const filterdSet = new Set(colorList);
-  const filterdList = [...filterdSet];
-  const obj: unitKey = {};
+export function extractColor(colorList: string[]): ClassGroups {
+  const groups: ClassGroups = {};
+  const keys = sortedAlternation(colorValueKeys);
+  const regex = new RegExp(`^u-(${keys})(${HEX_COLOR_PATTERN})$`);
 
-  filterdList.forEach((d) => {
-    const keys = colorValueKeys.join('|');
-    const regrex = new RegExp(`(${keys})([a-f|A-F|0-9]{3,6})`);
-    const result = d.match(regrex);
+  sortedUnique(colorList).forEach((word) => {
+    const result = word.match(regex);
+    if (!result) return;
 
-    if(result) {
-      const key = result[1];
-      const value = result[2];
-  
-      const oldList = obj[key] || [];
-      obj[key] = oldList.concat([value]);
-    }
+    addGroupValue(groups, result[1], result[2]);
   });
 
-  // // 排序，转化为字符串
-  // Object.keys(obj).forEach((k) => {
-  //   const list = obj[k];
-  //   // 加上引号
-  //   obj[k] = sort(list).map(d => `${d}`).join(',');
-  // });
-
-  return obj;
+  return groups;
 }
 
 export default {
